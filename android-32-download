@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# more can be found at https://androidsdkmanager.azurewebsite.net/SDKPlatform
+
+echo "
+By continuing, you agree to the respective license in using the third-party service, provided by dl.google.com, and the zip downloaded.
+
+At the time of writing, a copy of the license is at https://androidsdkmanager.azurewebsite.net/TandC .
+
+Do you want to continue? [Y for yes]
+"
+
+read -p "> " _ans
+
+if [[ $_ans == "Y" || $_ans == "y" ]]; then
+echo "downloading started"
+curl -O https://dl.google.com/android/repository/platform-32_r01.zip
+echo "unzipping started"
+unzip platform-32_r01.zip
+echo "done"
+else
+echo "aboarded"
+fi
