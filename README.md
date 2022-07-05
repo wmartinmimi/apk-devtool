@@ -14,7 +14,7 @@ How to use (quick start):
 cd ~
 pkg install openjdk-17 aapt2 d8 apksigner zip git curl android-tools
 git clone https://github.com/wmartinmimi/apk-devtool
-./android-32-download
+./apk-devtool/android-32-download
 ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
 cd <android-project-root>
 apkdev
