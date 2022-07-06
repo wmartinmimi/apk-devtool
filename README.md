@@ -7,6 +7,7 @@ A helper for developing android app.
 ## features
 Currently support:
 - apk building
+- project creation
 
 If you want to change some variables,
 you have to modify apkdev for now.
