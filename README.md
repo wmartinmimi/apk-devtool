@@ -23,7 +23,7 @@ cd apk-devtool
 ./android-32-download
 ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
 cd <android-project-root>
-apkdev
+apkdev build
 ```
 build/output.signed.apk will be produced,
 you can open it with
@@ -32,6 +32,10 @@ termux-open build/output.signed.apk
 ```
 but requires ```allow-external-apps = true``` in ~/.termux/termux.properties
 
+if you need the help manual, do
+```
+apkdev help
+```
 ## requests / issues
 
 If someone request a feature, I would try my best to add it.
