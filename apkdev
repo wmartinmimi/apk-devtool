@@ -2,8 +2,9 @@
 
 
 # variables
-_android_jar=~/apk-devtool/android-12/android.jar
-_jks=~/apk-devtool/debug.keystore
+_apkdev=~/apk-devtool
+_android_jar=$_apkdev/android-12/android.jar
+_jks=$_apkdev/debug.keystore
 _jks_pass="android"
 _branch=main
 _base=app/src/$_branch
@@ -133,14 +134,88 @@ build
 \tcreate a apk as build/output.signed.apk
 \texecute command at <project-root>
 
+new
+\tcreate a new android project.
+\thave a basic hello world setup.
+
 help
 \tprint this help message.
 "
 }
 
+new(){
+  echo "enter app name"
+  read -p "> " _name
+  echo "enter app package name"
+  read -p "> " _package
+
+  mkdir $_name
+
+  cd $_name
+
+  _package_dir=$(echo $_package | sed -r 's/[.]+/\//g')
+
+  mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values
+
+  cp $_apkdev/ic_launcher.png $_res/drawable
+
+  echo "<resources>
+    <string name=\"app_name\">$_name</string>
+</resources>"  > $_res/values/strings.xml
+  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"
+  android:layout_width=\"match_parent\"
+  android:layout_height=\"match_parent\">
+	<TextView
+     android:layout_width=\"wrap_content\"
+     android:layout_height=\"wrap_content\"
+     android:text=\"Hello World!\" />
+</LinearLayout>" > $_res/layout/activity_main.xml
+
+  
+  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"
+   android:versionCode=\"1\"
+   android:versionName=\"1.0\"
+   package=\"$_package\">
+
+	<application
+    android:theme=\"@android:style/Theme\"
+    android:label=\"@string/app_name\"
+    android:icon=\"@drawable/ic_launcher\">
+		<activity android:name=\".MainActivity\"
+       android:exported=\"true\">
+			<intent-filter>
+				<action android:name=\"android.intent.action.MAIN\" />
+				<category android:name=\"android.intent.category.LAUNCHER\" />
+			</intent-filter>
+		</activity>
+	</application>
+</manifest>" > $_base/AndroidManifest.xml 
+  echo "package $_package;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class MainActivity extends Activity {
+
+  protected void onCreate(Bundle bundle) {
+    super.onCreate(bundle);
+    this.setContentView(R.layout.activity_main);
+  }
+}
+" > $_java/$_package_dir/MainActivity.java
+
+  cd ..
+  echo "done"
+}
+
 case $1 in
   b*)
     build
+    ;;
+  n*)
+    new
     ;;
   *)
     help
