@@ -13,6 +13,19 @@ _java=$_base/java
 _manifest=$_base/AndroidManifest.xml
 # end
 
+_cyan=""
+_yellow=""
+_green=""
+_reset=""
+if [ ! $(tput colors) -eq -1 ]; then
+  if [ -t 1 ]; then
+    _cyan="\033[36m"
+    _yellow="\033[33m"
+    _green="\033[32m"
+    _reset="\033[m"
+  fi
+fi
+
 build(){
   case $1 in
     r*)
@@ -22,33 +35,42 @@ build(){
       _release=0
       ;;
   esac
-
   if [ -d build ]; then
+    echo -e $_cyan"clearing build directory..."$_yellow
     rm -r build
   fi
 
+  echo -e $_cyan"building build directory..."$_yellow
   mkdir -p build/gen build/java build/dex build/obj
 
-  cp $_apkdev/android-proguard-defaults build/android-proguard-defaults
+  if [ $_release -eq 1 ]; then
+    echo -e $_cyan"copying build resources..."$_yellow
+    cp $_apkdev/android-proguard-defaults build/android-proguard-defaults
+  fi
 
+  echo -e $_cyan"compiling resources..."$_yellow
   aapt2 compile --dir $_res -o build/obj
 
+  echo -e $_cyan"linking resources..."$_yellow
   if [ $_release -eq 1 ]; then
     aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --proguard build/proguard_options --proguard-minimal-keep-rules --no-xml-namespaces --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
   else
     aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
   fi
 
+  echo -e $_cyan"compiling java code..."$_yellow
   _package=$(aapt2 dump packagename build/output.unsigned.apk | sed -r 's/[.]+/\//g')
 
   javac -cp $_android_jar $(find -name "*.java" | grep "$_java") build/gen/$_package/R.java -d build/java -target 11 -source 11
 
+  echo -e $_cyan"converting java code to dex..."$_yellow
   if [ $_release -eq 1 ]; then
     r8 --dex --output build/dex/  --lib $_android_jar --pg-conf build/android-proguard-defaults --pg-conf build/proguard_options $(find -name "*.class" | grep "./build/java")
   else
     d8 --output build/dex/  --lib $_android_jar $(find -name "*.class" | grep "./build/java")
   fi
 
+  echo -e $_cyan"linking dex code..."$_yellow
   cd build/dex/
 
   zip -ur ../output.unsigned.apk classes.dex
@@ -56,17 +78,23 @@ build(){
   cd ../..
 
   if [ $_release -eq 1 ]; then
+    echo -e $_cyan"optimising apk structure..."$_yellow
     # optimize
     aapt2 optimize --shorten-resource-paths --collapse-resource-names --enable-sparse-encoding build/output.unsigned.apk -o build/output.optimized.apk
 
+    echo -e $_cyan"aligning apk..."$_yellow
     zipalign -f -p 4 build/output.optimized.apk build/output.aligned.apk
   else
+    echo -e $_cyan"aligning apk..."$_yellow
     zipalign -f -p 4 build/output.unsigned.apk build/output.aligned.apk
   fi
 
+  echo -e $_cyan"signing apk..."$_yellow
   apksigner sign -ks $_jks --ks-pass pass:$_jks_pass build/output.aligned.apk
 
   mv build/output.aligned.apk build/output.signed.apk
+
+  echo -e $_green"done"$_yellow
 }
 
 help(){
@@ -110,18 +138,19 @@ help
 }
 
 new(){
-  echo "enter app name"
+  echo -e $_green"enter app name:"$_reset
   read -p "> " _name
-  
+
   if [ -d $_name ]; then
     echo "$_name already exist!"
     echo "aborting!"
     return
   fi
-  
-  echo "enter app package name"
+
+  echo $_green"enter app package name:"$_reset
   read -p "> " _package
 
+  echo -e $_cyan"creating structure..."$_yellow
   mkdir $_name
 
   cd $_name
@@ -130,6 +159,7 @@ new(){
 
   mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values
 
+  echo -e $_cyan"filling resources..."$_yellow
   cp $_apkdev/ic_launcher.png $_res/drawable
 
   echo "<resources>
@@ -180,7 +210,7 @@ public class MainActivity extends Activity {
 " > $_java/$_package_dir/MainActivity.java
 
   cd ..
-  echo "done"
+  echo -e $_green"done"$_yellow
 }
 
 case $1 in
@@ -194,3 +224,4 @@ case $1 in
     help
     ;;
 esac
+echo -e $_reset
