@@ -17,6 +17,7 @@ echo "downloading started"
 curl -O https://dl.google.com/android/repository/platform-32_r01.zip
 echo "unzipping started"
 unzip platform-32_r01.zip
+rm platform-32_r01.zip
 echo "done"
 else
 echo "aboarded"
