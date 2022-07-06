@@ -23,7 +23,9 @@ build(){
       ;;
   esac
 
-  rm -r build
+  if [ -d build ]; then
+    rm -r build
+  fi
 
   mkdir -p build/gen build/java build/dex build/obj
 
@@ -95,7 +97,7 @@ build
 \t\thave optimization on.
 \tdebug (default when no options):
 \t\tbuilds a debug apk.
-\t\tcontains debug info. 
+\t\tcontains debug info.
 \texecute command at <project-root>
 
 new
@@ -110,6 +112,13 @@ help
 new(){
   echo "enter app name"
   read -p "> " _name
+  
+  if [ -d $_name ]; then
+    echo "$_name already exist!"
+    echo "aborting!"
+    return
+  fi
+  
   echo "enter app package name"
   read -p "> " _package
 
