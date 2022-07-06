@@ -14,6 +14,15 @@ _manifest=$_base/AndroidManifest.xml
 # end
 
 build(){
+  case $1 in
+    r*)
+      _release=1
+      ;;
+    *)
+      _release=0
+      ;;
+  esac
+
   rm -r build
 
   mkdir -p build/gen build/java build/dex build/obj
@@ -22,13 +31,21 @@ build(){
 
   aapt2 compile --dir $_res -o build/obj
 
-  aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --proguard build/proguard_options --proguard-minimal-keep-rules --no-xml-namespaces --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
+  if [ $_release -eq 1 ]; then
+    aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --proguard build/proguard_options --proguard-minimal-keep-rules --no-xml-namespaces --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
+  else
+    aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
+  fi
 
   _package=$(aapt2 dump packagename build/output.unsigned.apk | sed -r 's/[.]+/\//g')
 
   javac -cp $_android_jar $(find -name "*.java" | grep "$_java") build/gen/$_package/R.java -d build/java -target 11 -source 11
 
-  r8 --dex --output build/dex/  --lib $_android_jar --pg-conf build/android-proguard-defaults --pg-conf build/proguard_options $(find -name "*.class" | grep "./build/java")
+  if [ $_release -eq 1 ]; then
+    r8 --dex --output build/dex/  --lib $_android_jar --pg-conf build/android-proguard-defaults --pg-conf build/proguard_options $(find -name "*.class" | grep "./build/java")
+  else
+    d8 --output build/dex/  --lib $_android_jar $(find -name "*.class" | grep "./build/java")
+  fi
 
   cd build/dex/
 
@@ -36,10 +53,14 @@ build(){
 
   cd ../..
 
-  # optimize
-  aapt2 optimize --shorten-resource-paths --collapse-resource-names --enable-sparse-encoding build/output.unsigned.apk -o build/output.optimized.apk
+  if [ $_release -eq 1 ]; then
+    # optimize
+    aapt2 optimize --shorten-resource-paths --collapse-resource-names --enable-sparse-encoding build/output.unsigned.apk -o build/output.optimized.apk
 
-  zipalign -f -p 4 build/output.optimized.apk build/output.aligned.apk
+    zipalign -f -p 4 build/output.optimized.apk build/output.aligned.apk
+  else
+    zipalign -f -p 4 build/output.unsigned.apk build/output.aligned.apk
+  fi
 
   apksigner sign -ks $_jks --ks-pass pass:$_jks_pass build/output.aligned.apk
 
@@ -108,7 +129,7 @@ new(){
      android:text=\"Hello World!\" />
 </LinearLayout>" > $_res/layout/activity_main.xml
 
-  
+
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"
    android:versionCode=\"1\"
@@ -127,7 +148,7 @@ new(){
 			</intent-filter>
 		</activity>
 	</application>
-</manifest>" > $_base/AndroidManifest.xml 
+</manifest>" > $_base/AndroidManifest.xml
   echo "package $_package;
 
 import android.app.Activity;
