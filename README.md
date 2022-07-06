@@ -39,7 +39,8 @@ just do
 apkdev new
 ```
 it will prompt for basic details,
-and create a hello world project at <project-name>/
+and create a hello world project at ```<project-name>/```.
+
 the created project is ready to run on default.
 
 for different builds, you can do
