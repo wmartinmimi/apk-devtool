@@ -32,6 +32,15 @@ termux-open build/output.signed.apk
 ```
 but requires ```allow-external-apps = true``` in ~/.termux/termux.properties
 
+you can create a new project with apkdev,
+just do
+```
+apkdev new
+```
+it will prompt for basic details,
+and create a hello world project at <project-name>/
+the created project is ready to run on default.
+
 if you need the help manual, do
 ```
 apkdev help
