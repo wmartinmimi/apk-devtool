@@ -18,71 +18,7 @@ build(){
 
   mkdir -p build/gen build/java build/dex build/obj
 
-  echo "
--dontskipnonpubliclibraryclasses
--allowaccessmodification
--verbose
--keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
--keep public class com.google.vending.licensing.ILicensingService
--keep public class com.android.vending.licensing.ILicensingService
--keep public class com.google.android.vending.licensing.ILicensingService
--dontnote com.android.vending.licensing.ILicensingService
--dontnote com.google.vending.licensing.ILicensingService
--dontnote com.google.android.vending.licensing.ILicensingService
--keepclasseswithmembernames class * {
-    native <methods>;
-}
--keepclassmembers public class * extends android.view.View {
-    void set*(***);
-    *** get*();
-}
--keepclassmembers class * extends android.app.Activity {
-    public void *(android.view.View);
-}
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keepclassmembers class * implements android.os.Parcelable {
-    public static final ** CREATOR;
-}
--keepclassmembers class **.R$* {
-    public static <fields>;
-}
--keepclassmembers class * {
-    @android.webkit.JavascriptInterface <methods>;
-}
--dontnote android.support.**
--dontnote androidx.**
--dontwarn android.support.**
--dontwarn androidx.**
--dontwarn android.util.FloatMath
--keep class android.support.annotation.Keep
--keep class androidx.annotation.Keep
--keep @android.support.annotation.Keep class * {*;}
--keep @androidx.annotation.Keep class * {*;}
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <methods>;
-}
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <methods>;
-}
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <fields>;
-}
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <fields>;
-}
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <init>(...);
-}
--keepclasseswithmembers class * {
-    @androidx.annotation.Keep <init>(...);
-}
--dontnote org.apache.http.**
--dontnote android.net.http.**
--dontnote java.lang.invoke.**
-" > build/android-proguard-defaults
+  cp $_apkdev/android-proguard-defaults build/android-proguard-defaults
 
   aapt2 compile --dir $_res -o build/obj
 
