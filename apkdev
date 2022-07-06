@@ -89,6 +89,13 @@ build
 \tbuilds an apk.
 \twipes and make a build/ directory for compiling.
 \tcreate a apk as build/output.signed.apk
+\tavailable options: release/debug
+\trelease:
+\t\tbuilds a release apk.
+\t\thave optimization on.
+\tdebug (default when no options):
+\t\tbuilds a debug apk.
+\t\tcontains debug info. 
 \texecute command at <project-root>
 
 new

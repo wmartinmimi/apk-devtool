@@ -42,6 +42,15 @@ it will prompt for basic details,
 and create a hello world project at <project-name>/
 the created project is ready to run on default.
 
+for different builds, you can do
+```
+apkdev build release
+```
+or
+```
+apkdev build debug
+```
+
 if you need the help manual, do
 ```
 apkdev help
