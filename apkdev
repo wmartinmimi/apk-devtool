@@ -3,14 +3,7 @@
 
 # variables
 _apkdev=~/apk-devtool
-_android_jar=$_apkdev/android-12/android.jar
-_jks=$_apkdev/debug.keystore
-_jks_pass="android"
-_branch=main
-_base=app/src/$_branch
-_res=$_base/res
-_java=$_base/java
-_manifest=$_base/AndroidManifest.xml
+source $_apkdev/config
 # end
 
 _cyan=""
@@ -160,7 +153,7 @@ new(){
   mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values
 
   echo -e $_cyan"filling resources..."$_yellow
-  cp $_apkdev/ic_launcher.png $_res/drawable
+  cp $_apkdev/res/ic_launcher.png $_res/drawable
 
   echo "<resources>
     <string name=\"app_name\">$_name</string>

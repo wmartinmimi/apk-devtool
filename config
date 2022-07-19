@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# configurations
+
+# we expect the path of the apk-devtool directory to be in the environment variable APKDEV_ROOT
+# _apkdev=$APKDEV_ROOT
+
+# path of the android jar to be compiled against
+# recommends latest version
+_android_jar=$_apkdev/android-12/android.jar
+
+# path of java keystore to sign the apk
+_jks=$_apkdev/debug.keystore
+
+# the password for the java keystore
+_jks_pass="android"
+
+# the apk contents
+_branch=main
+_base=app/src/$_branch
+_res=$_base/res
+_java=$_base/java
+_manifest=$_base/AndroidManifest.xml
