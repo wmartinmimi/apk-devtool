@@ -139,7 +139,7 @@ new(){
     return
   fi
 
-  echo $_green"enter app package name:"$_reset
+  echo -e $_green"enter app package name:"$_reset
   read -p "> " _package
 
   echo -e $_cyan"creating structure..."$_yellow
