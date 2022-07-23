@@ -14,8 +14,7 @@ Currently support:
 - project creation
 
 If you want to change some variables,
-you have to modify apkdev for now.
-Sorry!
+you can modify config file in apk-devtool directory.
 
 Works on termux!
 
@@ -23,11 +22,10 @@ Works on termux!
 
 ```
 cd ~
-pkg install openjdk-17 aapt2 d8 apksigner zip git curl android-tools
+pkg install git
 git clone https://github.com/wmartinmimi/apk-devtool
 cd apk-devtool
-./android-32-download
-ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
+./quick-setup
 cd <android-project-root>
 apkdev build
 ```

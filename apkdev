@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # variables
 _apkdev=~/apk-devtool
 source $_apkdev/config

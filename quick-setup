@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# more can be found at https://androidsdkmanager.azurewebsite.net/SDKPlatform
+echo "installing required packages..."
+pkg install openjdk-17 aapt2 d8 apksigner zip curl android-tools
 
+# more can be found at https://androidsdkmanager.azurewebsite.net/SDKPlatform
 echo "
+Do you want to download and setup the android jar?
+A android 12 jar will be downloaded
+
 By continuing, you agree to the respective license in using the third-party service, provided by dl.google.com, and the zip downloaded.
 
 At the time of writing, a copy of the license is at https://androidsdkmanager.azurewebsite.net/TandC .
@@ -20,5 +25,10 @@ unzip platform-32_r01.zip
 rm platform-32_r01.zip
 echo "done"
 else
-echo "aboarded"
+echo "To setup an android jar,
+download and place it in android-12/,
+and rename to android.jar."
 fi
+
+ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
+
