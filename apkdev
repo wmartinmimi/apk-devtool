@@ -178,7 +178,7 @@ new(){
 
   _package_dir=$(echo $_package | sed -r 's/[.]+/\//g')
 
-  mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values
+  mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values $_assets
 
   echo -e $_cyan"filling resources..."$_yellow
   cp $_apkdev/res/ic_launcher.png $_res/drawable
