@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # variables
-_apkdev=~/apk-devtool
+if [ -z $APKDEV_ROOT ];
+then
+  _apkdev=~/apk-devtool
+else
+  _apkdev=$APKDEV_ROOT
+fi
 source $_apkdev/config
 # end
 
