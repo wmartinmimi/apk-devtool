@@ -32,6 +32,19 @@ build(){
       _release=0
       ;;
   esac
+
+  if [ -d .apkdev ]; then
+    echo -e $_cyan"reading project configuration..."$_yellow
+    cd .apkdev
+    if [ -f project_tree ]; then
+      source project_tree
+    fi
+    if [ -f signing ]; then
+      source signing
+    fi
+    cd ..
+  fi
+
   if [ -d build ]; then
     echo -e $_cyan"clearing build directory..."$_yellow
     rm -r build
@@ -178,7 +191,25 @@ new(){
 
   _package_dir=$(echo $_package | sed -r 's/[.]+/\//g')
 
-  mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values $_assets
+  mkdir -p .apkdev $_java/$_package_dir $_res/layout $_res/drawable $_res/values $_assets
+
+  echo -e $_cyan"setting default configurations..."$_yellow
+
+  echo "#!/bin/bash
+
+  #configuration for apk-devtool
+  _java=$_java
+  _res=$_res
+  _assets=$_assets
+  _base=$_base
+  " > .apkdev/project_tree
+
+  echo "#!/bin/bash
+
+  #signing configuration for apk-devtool
+  #_jks=$_jks
+  #_jks_pass=$_jks_pass
+  " > .apkdev/signing
 
   echo -e $_cyan"filling resources..."$_yellow
   cp $_apkdev/res/ic_launcher.png $_res/drawable
