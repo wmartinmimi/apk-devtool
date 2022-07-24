@@ -20,4 +20,5 @@ _branch=main
 _base=app/src/$_branch
 _res=$_base/res
 _java=$_base/java
+_assets=$_base/assets
 _manifest=$_base/AndroidManifest.xml

@@ -49,11 +49,35 @@ build(){
   aapt2 compile --dir $_res -o build/obj
 
   echo -e $_cyan"linking resources..."$_yellow
-  if [ $_release -eq 1 ]; then
-    aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --proguard build/proguard_options --proguard-minimal-keep-rules --no-xml-namespaces --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
-  else
-    aapt2 link -o build/output.unsigned.apk --manifest $_manifest --auto-add-overlay --java build/gen/ -I $_android_jar build/obj/*.flat --override-styles-instead-of-overlaying --allow-reserved-package-id --no-version-vectors --no-auto-version --no-version-transitions --min-sdk-version 16 --target-sdk-version 32
+
+  _link_opts="
+  -o build/output.unsigned.apk
+  --manifest $_manifest
+  --java build/gen/
+  build/obj/*.flat
+  -I $_android_jar
+  --auto-add-overlay
+  --override-styles-instead-of-overlaying
+  --allow-reserved-package-id
+  --no-version-vectors
+  --no-auto-version
+  --no-version-transitions
+  --min-sdk-version 16
+  --target-sdk-version 32
+  "
+  if [ -d $_assets ];then
+    _link_opts=$_link_opts"
+    -A $_assets
+    "
   fi
+  if [ $_release -eq 1 ]; then
+    _link_opts=$_link_opts"
+    --proguard build/proguard_options
+    --proguard-minimal-keep-rules
+    --no-xml-namespaces
+    "
+  fi
+  aapt2 link $_link_opts
 
   echo -e $_cyan"compiling java code..."$_yellow
   _package=$(aapt2 dump packagename build/output.unsigned.apk | sed -r 's/[.]+/\//g')
@@ -77,7 +101,7 @@ build(){
   if [ $_release -eq 1 ]; then
     echo -e $_cyan"optimising apk structure..."$_yellow
     # optimize
-    aapt2 optimize --shorten-resource-paths --collapse-resource-names --enable-sparse-encoding build/output.unsigned.apk -o build/output.optimized.apk
+    aapt2 optimize --shorten-resource-paths --collapse-resource-names build/output.unsigned.apk -o build/output.optimized.apk
 
     echo -e $_cyan"aligning apk..."$_yellow
     zipalign -f -p 4 build/output.optimized.apk build/output.aligned.apk
@@ -96,42 +120,42 @@ build(){
 
 help(){
   echo -e "
-apkdev is a development helper for building apks.
+  apkdev is a development helper for building apks.
 
-notice:
-expected structure
-\t<project-root>
-\t  |-app/src/
-\t     |-main/ (_branch) (_base)
-\t       |-res/ (_res)
-\t       |-java/ (_java)
-\t       |-AndroidManifest.xml (_manifest)
+  notice:
+  expected structure
+  \t<project-root>
+  \t  |-app/src/
+  \t     |-main/ (_branch) (_base)
+  \t       |-res/ (_res)
+  \t       |-java/ (_java)
+  \t       |-AndroidManifest.xml (_manifest)
 
-\tto change the expected structure,
-\tchange the variables in the script.
-\t(ie. _branch, _java, etc.)
+  \tto change the expected structure,
+  \tchange the variables in the script.
+  \t(ie. _branch, _java, etc.)
 
-to use:
-build
-\tbuilds an apk.
-\twipes and make a build/ directory for compiling.
-\tcreate a apk as build/output.signed.apk
-\tavailable options: release/debug
-\trelease:
-\t\tbuilds a release apk.
-\t\thave optimization on.
-\tdebug (default when no options):
-\t\tbuilds a debug apk.
-\t\tcontains debug info.
-\texecute command at <project-root>
+  to use:
+  build
+  \tbuilds an apk.
+  \twipes and make a build/ directory for compiling.
+  \tcreate a apk as build/output.signed.apk
+  \tavailable options: release/debug
+  \trelease:
+  \t\tbuilds a release apk.
+  \t\thave optimization on.
+  \tdebug (default when no options):
+  \t\tbuilds a debug apk.
+  \t\tcontains debug info.
+  \texecute command at <project-root>
 
-new
-\tcreate a new android project.
-\thave a basic hello world setup.
+  new
+  \tcreate a new android project.
+  \thave a basic hello world setup.
 
-help
-\tprint this help message.
-"
+  help
+  \tprint this help message.
+  "
 }
 
 new(){
@@ -160,54 +184,54 @@ new(){
   cp $_apkdev/res/ic_launcher.png $_res/drawable
 
   echo "<resources>
-    <string name=\"app_name\">$_name</string>
-</resources>"  > $_res/values/strings.xml
+  <string name=\"app_name\">$_name</string>
+  </resources>"  > $_res/values/strings.xml
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"
+  <LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"
   android:layout_width=\"match_parent\"
   android:layout_height=\"match_parent\">
-	<TextView
-     android:layout_width=\"wrap_content\"
-     android:layout_height=\"wrap_content\"
-     android:text=\"Hello World!\" />
-</LinearLayout>" > $_res/layout/activity_main.xml
+  <TextView
+  android:layout_width=\"wrap_content\"
+  android:layout_height=\"wrap_content\"
+  android:text=\"Hello World!\" />
+  </LinearLayout>" > $_res/layout/activity_main.xml
 
 
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"
-   android:versionCode=\"1\"
-   android:versionName=\"1.0\"
-   package=\"$_package\">
+  <manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"
+  android:versionCode=\"1\"
+  android:versionName=\"1.0\"
+  package=\"$_package\">
 
-	<application
-    android:theme=\"@android:style/Theme\"
-    android:label=\"@string/app_name\"
-    android:icon=\"@drawable/ic_launcher\">
-		<activity android:name=\".MainActivity\"
-       android:exported=\"true\">
-			<intent-filter>
-				<action android:name=\"android.intent.action.MAIN\" />
-				<category android:name=\"android.intent.category.LAUNCHER\" />
-			</intent-filter>
-		</activity>
-	</application>
-</manifest>" > $_base/AndroidManifest.xml
+  <application
+  android:theme=\"@android:style/Theme\"
+  android:label=\"@string/app_name\"
+  android:icon=\"@drawable/ic_launcher\">
+  <activity android:name=\".MainActivity\"
+  android:exported=\"true\">
+  <intent-filter>
+  <action android:name=\"android.intent.action.MAIN\" />
+  <category android:name=\"android.intent.category.LAUNCHER\" />
+  </intent-filter>
+  </activity>
+  </application>
+  </manifest>" > $_base/AndroidManifest.xml
   echo "package $_package;
 
-import android.app.Activity;
-import android.os.Bundle;
+  import android.app.Activity;
+  import android.os.Bundle;
 
-public class MainActivity extends Activity {
+  public class MainActivity extends Activity {
 
   protected void onCreate(Bundle bundle) {
-    super.onCreate(bundle);
-    this.setContentView(R.layout.activity_main);
-  }
+  super.onCreate(bundle);
+  this.setContentView(R.layout.activity_main);
+}
 }
 " > $_java/$_package_dir/MainActivity.java
 
-  cd ..
-  echo -e $_green"done"$_yellow
+cd ..
+echo -e $_green"done"$_yellow
 }
 
 case $1 in
