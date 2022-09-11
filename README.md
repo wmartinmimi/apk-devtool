@@ -20,7 +20,7 @@ Works on termux!
 
 ## How to use (quick start)
 
-```
+```bash
 cd ~
 pkg install git
 git clone https://github.com/wmartinmimi/apk-devtool
@@ -33,7 +33,7 @@ apkdev build
 build/output.signed.apk will be produced,
 you can open it with
 
-```
+```bash
 termux-open build/output.signed.apk
 ```
 
@@ -42,7 +42,7 @@ but requires ```allow-external-apps = true``` in ~/.termux/termux.properties
 you can create a new project with apkdev,
 just do
 
-```
+```bash
 apkdev new
 ```
 
@@ -53,19 +53,19 @@ the created project is ready to run on default.
 
 for different builds, you can do
 
-```
+```bash
 apkdev build release
 ```
 
 or
 
-```
+```bash
 apkdev build debug
 ```
 
 if you need the help manual, do
 
-```
+```bash
 apkdev help
 ```
 
