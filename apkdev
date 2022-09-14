@@ -138,6 +138,7 @@ help(){
   notice:
   expected structure
   \t<project-root>
+  \t  |-.apkdev/ (configurations)
   \t  |-app/src/
   \t     |-main/ (_branch) (_base)
   \t       |-res/ (_res)
@@ -149,24 +150,35 @@ help(){
   \t(ie. _branch, _java, etc.)
 
   to use:
-  build
+  eg. apkdev build debug
+  eg. apkdev h
+  eg. apkdev c n
+
+  build (shortcut: b)
   \tbuilds an apk.
   \twipes and make a build/ directory for compiling.
   \tcreate a apk as build/output.signed.apk
   \tavailable options: release/debug
-  \trelease:
+  \trelease (r):
   \t\tbuilds a release apk.
   \t\thave optimization on.
-  \tdebug (default when no options):
+  \tdebug (d) (default when no options):
   \t\tbuilds a debug apk.
   \t\tcontains debug info.
   \texecute command at <project-root>
 
-  new
+  new (n)
   \tcreate a new android project.
   \thave a basic hello world setup.
 
-  help
+  config (c)
+  \toperation to configurate projects
+  \tavailable option: new
+  \tnew (n):
+  \t\tcreate a configuration for an existing project
+
+
+  help (h) (default if no options)
   \tprint this help message.
   "
 }
@@ -191,25 +203,9 @@ new(){
 
   _package_dir=$(echo $_package | sed -r 's/[.]+/\//g')
 
-  mkdir -p .apkdev $_java/$_package_dir $_res/layout $_res/drawable $_res/values $_assets
+  mkdir -p $_java/$_package_dir $_res/layout $_res/drawable $_res/values $_assets
 
-  echo -e $_cyan"setting default configurations..."$_yellow
-
-  echo "#!/bin/bash
-
-  #configuration for apk-devtool
-  _java=$_java
-  _res=$_res
-  _assets=$_assets
-  _base=$_base
-  " > .apkdev/project_tree
-
-  echo "#!/bin/bash
-
-  #signing configuration for apk-devtool
-  #_jks=$_jks
-  #_jks_pass=$_jks_pass
-  " > .apkdev/signing
+  config new 
 
   echo -e $_cyan"filling resources..."$_yellow
   cp $_apkdev/res/ic_launcher.png $_res/drawable
@@ -265,12 +261,51 @@ cd ..
 echo -e $_green"done"$_yellow
 }
 
+config(){
+  _option=0
+  case $1 in
+    n*)
+      _option=1
+      ;;
+    *)
+      echo "$1 o"
+      help
+      return
+      ;;
+  esac
+  if [[ $_option -eq 1 ]]; then
+    echo -e $_cyan"setting default configurations..."$_yellow
+
+    
+    mkdir -p .apkdev
+
+    echo "#!/bin/bash
+
+  #configuration for apk-devtool
+  _java=$_java
+  _res=$_res
+  _assets=$_assets
+  _base=$_base
+  " > .apkdev/project_tree
+
+  echo "#!/bin/bash
+
+  #signing configuration for apk-devtool
+  #_jks=$_jks
+  #_jks_pass=$_jks_pass
+  " > .apkdev/signing
+  fi
+}
+
 case $1 in
   b*)
-    build
+    build $2
     ;;
   n*)
     new
+    ;;
+  c*)
+    config $2
     ;;
   *)
     help
