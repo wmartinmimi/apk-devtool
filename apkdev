@@ -167,6 +167,18 @@ help(){
   \t\tcontains debug info.
   \texecute command at <project-root>
 
+  maven (m)
+  \toperations using maven repos
+  \tavailable options: download
+  \tdownload (d):
+  \t\tdownload jars requested
+  \t\tapkdev m d <group_id>:<id>:<version> <repo url>
+  \t\tdefault repo url:
+  \t\t\thttps://dl.google.com/android/maven2
+  \t\t\thttps://repo1.maven.org/maven2
+  \t\teg. apkdev m d androidx.core:core:1.9.0
+  \t\teg.apkdev m d org.mozilla.components:support-base:105.0.6 https://maven.mozilla.org/maven2
+
   new (n)
   \tcreate a new android project.
   \thave a basic hello world setup.
@@ -276,7 +288,7 @@ config(){
   if [[ $_option -eq 1 ]]; then
     echo -e $_cyan"setting default configurations..."$_yellow
 
-    
+
     mkdir -p .apkdev
 
     echo "#!/bin/bash
@@ -297,6 +309,43 @@ config(){
   fi
 }
 
+maven(){
+  case $1 in
+    d*)
+      mavendl $2 $3
+      ;;
+    *)
+      help
+      ;;
+  esac
+}
+
+mavendl(){
+  _maven="
+  $2
+  https://dl.google.com/android/maven2
+  https://repo1.maven.org/maven2
+  "
+
+  _name="$1"
+
+# split to block
+_b=($(echo $_name | tr ":" "\n"))
+# group id
+_gid=$(echo ${_b[0]} | tr "." "/")
+# id
+_id=${_b[1]}
+# version
+_v=${_b[2]}
+
+for url in $_maven; do
+  wget "$url/$_gid/$_id/$_v/$_id-$_v-sources.jar"
+  if [[ $? -eq 0 ]]; then
+    break
+  fi
+done
+}
+
 case $1 in
   b*)
     build $2
@@ -306,6 +355,9 @@ case $1 in
     ;;
   c*)
     config $2
+    ;;
+  m*)
+    maven $2 $3 $4
     ;;
   *)
     help

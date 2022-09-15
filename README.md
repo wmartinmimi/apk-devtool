@@ -63,6 +63,22 @@ or
 apkdev build debug
 ```
 
+to download maven jars, do
+
+```bash
+apkdev m d <groupid>:<id>:<version> <url>
+```
+
+examples:
+
+```bash
+apkdev m d androidx.core:core:1.9.0
+```
+
+```bash
+apkdev m d org.mozilla.components:support-base:105.0.6 https://maven.mozilla.org/maven2
+```
+
 if you need the help manual, do
 
 ```bash
@@ -71,6 +87,6 @@ apkdev help
 
 ## requests / issues
 
-If someone request a feature, I would try my best to add it.
+If you request a feature, I would try my best to add it.
 
 We welcome any issues or contributions!
