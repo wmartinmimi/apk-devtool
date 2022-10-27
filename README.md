@@ -1,17 +1,18 @@
-# apk-devtool
+# Apk-Devtool
 
 apk development on the command line (no gradle or ant)
 
-## description
+## Description
 
 A helper for developing android app.
 
-## features
+## Features
 
-Currently support:
+Currently supporting:
 
 - apk building
 - project creation
+- both java and kotlin code
 
 If you want to change some variables,
 you can modify config file in apk-devtool directory.

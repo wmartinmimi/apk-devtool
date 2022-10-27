@@ -92,12 +92,29 @@ build(){
   fi
   aapt2 link $_link_opts
 
-  echo -e $_cyan"compiling java code..."$_yellow
+  echo -e $_cyan"searching for java code..."$_yellow
+
+  _java_files=$(find -name "*.java" | grep "$_java")
+
+  echo -e $_cyan"searching for kotlin code..."$_yellow
+  _kotlin_files=$(find -name "*.kt" | grep "$_java")
+
   _package=$(aapt2 dump packagename build/output.unsigned.apk | sed -r 's/[.]+/\//g')
 
-  javac -cp $_android_jar $(find -name "*.java" | grep "$_java") build/gen/$_package/R.java -d build/java -target 11 -source 11
 
-  echo -e $_cyan"converting java code to dex..."$_yellow
+  if [ ! -z $_kotlin_files ];
+  then
+    echo -e $_cyan"compiling kotlin code..."
+    kotlinc $_kotlin_files $_java_files -cp $_android_jar build/gen/$_package/R.java -d build/java
+  fi
+
+  if [ ! -z $_java_files ];
+  then
+    echo -e $_cyan"compiling java code..."$_yellow
+    javac -cp $_android_jar:build/java $_java_files build/gen/$_package/R.java -d build/java -target 11 -source 11
+  fi
+
+  echo -e $_cyan"converting java bytecode to dex..."$_yellow
   if [ $_release -eq 1 ]; then
     r8 --dex --output build/dex/  --lib $_android_jar --pg-conf build/android-proguard-defaults --pg-conf build/proguard_options $(find -name "*.class" | grep "./build/java")
   else
@@ -255,19 +272,19 @@ new(){
   </activity>
   </application>
   </manifest>" > $_base/AndroidManifest.xml
-  echo "package $_package;
+  echo "package $_package
 
-  import android.app.Activity;
-  import android.os.Bundle;
+import android.app.Activity
+import android.os.Bundle
 
-  public class MainActivity extends Activity {
+  class MainActivity(): Activity() {
 
-  protected void onCreate(Bundle bundle) {
-  super.onCreate(bundle);
-  this.setContentView(R.layout.activity_main);
+  override fun onCreate(bundle: Bundle?) {
+    super.onCreate(bundle)
+    this.setContentView(R.layout.activity_main)
+  }
 }
-}
-" > $_java/$_package_dir/MainActivity.java
+" > $_java/$_package_dir/MainActivity.kt
 
 cd ..
 echo -e $_green"done"$_yellow
