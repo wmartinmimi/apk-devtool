@@ -216,7 +216,7 @@ new(){
   echo -e $_green"enter app name:"$_reset
   read -p "> " _name
 
-  if [ -d $_name ]; then
+  if [ -d "$_name" ]; then
     echo "$_name already exist!"
     echo "aborting!"
     return
@@ -226,9 +226,9 @@ new(){
   read -p "> " _package
 
   echo -e $_cyan"creating structure..."$_yellow
-  mkdir $_name
+  mkdir "$_name"
 
-  cd $_name
+  cd "$_name"
 
   _package_dir=$(echo $_package | sed -r 's/[.]+/\//g')
 
