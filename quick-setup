@@ -6,29 +6,33 @@ apt install openjdk-17 aapt2 d8 apksigner zip curl android-tools kotlin
 # more can be found at https://androidsdkmanager.azurewebsite.net/SDKPlatform
 echo "
 Do you want to download and setup the android jar?
-A android 12 jar will be downloaded
+  A android 13 jar will be downloaded.
 
-By continuing, you agree to the respective license in using the third-party service, provided by dl.google.com, and the zip downloaded.
+  !!!Continuing will ERASE ALL DATA in android-12/ to be removed!!!
 
-At the time of writing, a copy of the license is at https://androidsdkmanager.azurewebsite.net/TandC .
+  By continuing, you agree to the respective license in using the third-party service, provided by dl.google.com, and the zip downloaded.
+
+  At the time of writing, a copy of the license is at https://androidsdkmanager.azurewebsite.net/TandC .
 
 Do you want to continue? [Y for yes]
-"
+  "
 
-read -p "> " _ans
+  read -p "> " _ans
 
-if [[ $_ans == "Y" || $_ans == "y" ]]; then
-echo "downloading started"
-curl -O https://dl.google.com/android/repository/platform-32_r01.zip
-echo "unzipping started"
-unzip platform-32_r01.zip
-rm platform-32_r01.zip
-echo "done"
-else
-echo "To setup an android jar,
-download and place it in android-12/,
-and rename to android.jar."
-fi
+  if [[ $_ans == "Y" || $_ans == "y" ]]; then
+    rm -r android-12/
+    echo "downloading started"
+    curl -O https://dl.google.com/android/repository/platform-33_r01.zip
+    echo "unzipping started"
+    unzip platform-33_r01.zip
+    rm platform-33_r01.zip
+    mv android-13/ android-12/
+    echo "done"
+  else
+    echo "To setup an android jar,
+    download and place it in android-12/,
+    and rename to android.jar."
+  fi
 
-ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
+  ln -s ~/apk-devtool/apkdev $PREFIX/bin/apkdev
 
