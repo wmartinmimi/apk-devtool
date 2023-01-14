@@ -111,7 +111,7 @@ build(){
   if [ ! -z "$_java_files" ];
   then
     echo -e $_cyan"compiling java code..."$_yellow
-    javac -cp $_android_jar:build/java $_java_files build/gen/$_package/R.java -d build/java -target 11 -source 11
+    javac -cp $_android_jar:build/java $_java_files build/gen/$_package/R.java -d build/java
   fi
 
   echo -e $_cyan"converting java bytecode to dex..."$_yellow
@@ -145,6 +145,7 @@ build(){
 
   mv build/output.aligned.apk build/output.signed.apk
 
+  termux-open build/output.signed.apk & 2&> /dev/null
   echo -e $_green"done"$_yellow
 }
 
