@@ -13,6 +13,7 @@ Currently supporting:
 - apk building
 - project creation
 - both java and kotlin code
+- some degree of maven jar download
 
 If you want to change some variables,
 you can modify config file in apk-devtool directory.
